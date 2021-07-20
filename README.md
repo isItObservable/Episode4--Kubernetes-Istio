@@ -39,65 +39,11 @@ gcloud containr clusters create isitobservable \
 git clone https://github.com/isItObservable/Episode4--Kubernetes-Istio
 cd Episode4--Kubernetes-Istio
 ```
-### 4. Deploy Prometheus
+### 4. Deploy istio
 #### HipsterShop
 ```
 cd hipstershop
 ./setup.sh
-```
-#### Prometheus ( already done during Episde 1)
-```
-helm install prometheus stable/prometheus-operator
-```
-#### Expose Grafana
-```
-kubectl get svc
-kubectl edit svc prometheus-grafana
-```
-change to type NodePort
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    meta.helm.sh/release-name: prometheus
-    meta.helm.sh/release-namespace: default
-  labels:
-    app.kubernetes.io/instance: prometheus
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 7.0.3
-    helm.sh/chart: grafana-5.3.0
-  name: prometheus-grafana
-  namespace: default
-  resourceVersion: "89873265"
-  selfLink: /api/v1/namespaces/default/services/prometheus-grafana
-spec:
-  clusterIP: IPADRESSS
-  externalTrafficPolicy: Cluster
-  ports:
-  - name: service
-    nodePort: 30806
-    port: 80
-    protocol: TCP
-    targetPort: 3000
-  selector:
-    app.kubernetes.io/instance: prometheus
-    app.kubernetes.io/name: grafana
-  sessionAffinity: None
-  type: NodePort
-status:
-  loadBalancer: {}
-```
-
-Get the login user and password of Grafana
-* For the password :
-```
-kubectl get secret --namespace default prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 --decode
-```
-* For the login user:
-```
-kubectl get secret --namespace default prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode
 ```
 
 #### Install Istioctl
@@ -144,12 +90,9 @@ kubectl apply -f serviceEntry_egress.yaml -n istio-system
 
 ##### Prometheus
 
-Istio also provide the ability to deploy Prometheus as an addon and expose envoy's metric in a prometheus format.
-if you already have prometheus operator installed then you will only need to deploy the CRD PodMonitor availabla in the istio forlder
-To install Kiali you will need to go to the sample/addons directory :
 ```
-cd cd istio-1.10.3/sample/addons/extras
-kubectl apply -f prometheus-operator.yaml
+cd cd istio-1.10.3/sample/addons
+kubectl apply -f prometheus.yaml
 ```
 ##### Jaeger
 
@@ -165,14 +108,26 @@ To install Kiali you will need to go to the sample/addons directory :
 cd cd istio-1.10.3/sample/addons
 kubectl apply -f kiali.yaml 
 ```
+##### grafana
+
+To install Kiali you will need to go to the sample/addons directory :
+```
+cd cd istio-1.10.3/sample/addons
+kubectl apply -f grafana.yaml 
+```
 #### Configure Hipster-shop
 
-##### Create an egress gateway
+##### delete the front-end loadbalancer service
+Let's remove the default external loadbalancer created with hipster-shop
+```
+kubectl delete svc  frontend-external -n hipster-shop
+```
+
+##### Create an ingresse gateway
 To expose the Hipster-shop out of our cluster, let's deploy a virtual service and a Gateway :
 ```
 cd Episode4--Kubernetes-Istio/istio
-kubectl apply -f hister-shop-gateway.yaml -n hipster-shop
-kubectl apply -f virtualservice_frontend.yaml -n hipster-shop
+kubectl apply -f hister-shop-gateway.yaml 
 ```
 
 
