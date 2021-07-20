@@ -131,15 +131,6 @@ kubectl delete -f ./hipster-shop/k8s-manifest.yaml -n hipster-shop
 kubectl apply -f ./hipster-shop/k8s-manifest.yaml -n hipster-shop 
 ```
 
-#### Configure Hipster-shop
-
-##### Create an egress gateway
-To expose the Hipster-shop out of our cluster, let's deploy a virtual service and a Gateway :
-```
-cd Episode4--Kubernetes-Istio/istio
-kubectl apply -f hister-shop-gateway.yaml -n hipster-shop
-kubectl apply -f virtualservice_frontend.yaml -n hipster-shop
-```
 
 
 ##### Authorise outgoing communication to GCP
@@ -173,6 +164,15 @@ To install Kiali you will need to go to the sample/addons directory :
 ```
 cd cd istio-1.10.3/sample/addons
 kubectl apply -f kiali.yaml 
+```
+#### Configure Hipster-shop
+
+##### Create an egress gateway
+To expose the Hipster-shop out of our cluster, let's deploy a virtual service and a Gateway :
+```
+cd Episode4--Kubernetes-Istio/istio
+kubectl apply -f hister-shop-gateway.yaml -n hipster-shop
+kubectl apply -f virtualservice_frontend.yaml -n hipster-shop
 ```
 
 
