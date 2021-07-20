@@ -89,11 +89,7 @@ spec:
 status:
   loadBalancer: {}
 ```
-Deploy the ingress by making sure to replace the service name of your grafan
-```
-cd ..\grafana
-kubectl apply -f ingress.yaml
-```
+
 Get the login user and password of Grafana
 * For the password :
 ```
@@ -103,10 +99,7 @@ kubectl get secret --namespace default prometheus-grafana -o jsonpath="{.data.ad
 ```
 kubectl get secret --namespace default prometheus-grafana -o jsonpath="{.data.admin-user}" | base64 --decode
 ```
-Get the ip adress of your Grafana
-```
-kubectl get ingress grafana-ingress -ojson | jq  '.status.loadBalancer.ingress[].ip'
-```
+
 #### Install Istioctl
 1. Download Istioctl
 ```
@@ -115,7 +108,7 @@ curl -L https://istio.io/downloadIstio | sh -
 This command download the latest version of istio ( in our case iostio 1.10.2) compatible with our operating system.
 2. Add istioctl to you PATH
 ```
-cd istio-1.10.2
+cd istio-1.10.3
 ```
 this directory contains samples with addons . We will refer to it later.
 ```
@@ -160,36 +153,25 @@ kubectl apply -f serviceEntry_egress.yaml -n istio-system
 
 ##### Prometheus
 
-To scrape Istiod stats, the following example job can be added to scrape its http-monitoring port it will be required to update the prometheus config map by adding the following job
+Istio also provide the ability to deploy Prometheus as an addon and expose envoy's metric in a prometheus format.
+if you already have prometheus operator installed then you will only need to deploy the CRD PodMonitor availabla in the istio forlder
+To install Kiali you will need to go to the sample/addons directory :
 ```
-- job_name: 'istiod'
-  kubernetes_sd_configs:
-    - role: endpoints
-      namespaces:
-      names:
-        - istio-system
-          relabel_configs:
-    - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
-      action: keep
-      regex: istiod;http-monitoring
+cd cd istio-1.10.3/sample/addons/extras
+kubectl apply -f prometheus-operator.yaml
 ```
-To scrape Envoy stats, including sidecar proxies and gateway proxies, the following job can be added to scrape ports that end with -envoy-prom:
-```
-- job_name: 'envoy-stats'
-  metrics_path: /stats/prometheus
-  kubernetes_sd_configs:
-    - role: pod
+##### Jaeger
 
-  relabel_configs:
-    - source_labels: [__meta_kubernetes_pod_container_port_name]
-      action: keep
-      regex: '.*-envoy-prom'
+We also need Jaeger to collect traces in Kiali.
+```
+cd cd istio-1.10.3/sample/addons
+kubectl apply -f jaeger.yaml
 ```
 ##### Kiali
 
 To install Kiali you will need to go to the sample/addons directory :
 ```
-cd istio-1.10.2/sample/addons
+cd cd istio-1.10.3/sample/addons
 kubectl apply -f kiali.yaml 
 ```
 

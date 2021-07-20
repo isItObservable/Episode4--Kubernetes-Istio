@@ -23,8 +23,16 @@ spec:
   gateways:
     - histershop-gateway
   http:
-      route:
+  - match:
+    - uri:
+        prefix: /kiali
+      - route:
         - destination:
-            host: frontend
+            host: kiali.istio-system.svc.cluster.local
             port:
-              number: 80
+              number:
+    - uri:
+        prefix: /grafana
+      - route:
+          - destination :
+              host: grafana.default.svc.cluster.local
