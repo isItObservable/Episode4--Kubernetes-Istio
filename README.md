@@ -152,5 +152,5 @@ kubectl apply -f hister-shop-gateway.yaml
 kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 ```
 Open your browser to look at Kiali :
-http://<EXTERNAL IP>:8181
+http://< EXTERNAL IP >:8181
 
