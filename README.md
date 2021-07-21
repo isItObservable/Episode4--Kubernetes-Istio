@@ -123,12 +123,34 @@ Let's remove the default external loadbalancer created with hipster-shop
 kubectl delete svc  frontend-external -n hipster-shop
 ```
 
+##### Update the ingressgateway to expose ports for grafana, kiali and hipstershop
+```
+kubectl edit svc istio-ingressgateway -n istio-system
+```
+Add the following ports :
+```
+- name: grafana
+  nodePort: 31770
+  port: 8080
+  protocol: TCP
+  targetPort: 8182
+- name: kiali
+  nodePort: 31780
+  port: 8181
+  protocol: TCP
+  targetPort: 8183
+```
+
 ##### Create an ingresse gateway
-To expose the Hipster-shop out of our cluster, let's deploy a virtual service and a Gateway :
+To expose the Hipster-shop the grafana, kiali and the hipstershop. Deploy the manifest containing the Gateway and virtual service definition:
 ```
 cd Episode4--Kubernetes-Istio/istio
 kubectl apply -f hister-shop-gateway.yaml 
 ```
-
-
+#### get the external ip of the ingressagateway 
+```
+kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+Open your browser to look at Kiali :
+http://<EXTERNAL IP>:8181
 
